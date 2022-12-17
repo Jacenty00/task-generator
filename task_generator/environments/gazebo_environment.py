@@ -10,7 +10,7 @@ from std_msgs.msg import Empty
 from std_srvs.srv import Empty, SetBool, Trigger
 from task_generator.environments.environment_factory import EnvironmentFactory
 from tf.transformations import quaternion_from_euler
-
+from task_generator.manager.pedsim_manager import PedsimManager
 from ..constants import Constants
 from .base_environment import BaseEnvironment
 from .environment_factory import EnvironmentFactory
@@ -23,15 +23,17 @@ class GazeboEnvironment(BaseEnvironment):
     def __init__(self, namespace):
         super().__init__(namespace)
 
-        self._goal_pub = rospy.Publisher(self._ns_prefix("/goal"), PoseStamped, queue_size=1, latch=True)
+        self._goal_pub = rospy.Publisher(
+            self._ns_prefix("/goal"), PoseStamped, queue_size=1, latch=True
+        )
 
         self._robot_name = rospy.get_param("robot_model")
 
         rospy.wait_for_service("/gazebo/spawn_urdf_model")
         rospy.wait_for_service("/gazebo/set_model_state")
-        # rospy.wait_for_service("/pedsim_simulator/spawn_peds", timeout=T)
-        # rospy.wait_for_service("/pedsim_simulator/reset_all_peds", timeout=T)
-        # rospy.wait_for_service("/pedsim_simulator/remove_all_peds", timeout=T)
+        rospy.wait_for_service("/pedsim_simulator/spawn_peds", timeout=T)
+        rospy.wait_for_service("/pedsim_simulator/reset_all_peds", timeout=T)
+        rospy.wait_for_service("/pedsim_simulator/remove_all_peds", timeout=T)
 
         self._spawn_model_srv = rospy.ServiceProxy(
             self._ns_prefix("gazebo", "spawn_urdf_model"), SpawnModel
@@ -52,8 +54,6 @@ class GazeboEnvironment(BaseEnvironment):
         self.unpause = rospy.ServiceProxy("/gazebo/unpause_physics", Empty)
         self.pause = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
 
-        self.map_manager = None
-
     def before_reset_task(self):
         self.pause()
         pass
@@ -63,28 +63,30 @@ class GazeboEnvironment(BaseEnvironment):
         pass
 
     def remove_all_obstacles(self):
-        # self._remove_peds_srv(True)
+        self._remove_peds_srv(True)
         pass
 
     def spawn_pedsim_agents(self, agents):
-        peds = [agent.getPedMsg() for agent in agents]
-        # self._spawn_peds_srv(peds)
+        # peds = [agent.getPedMsg() for agent in agents]
+        peds = [PedsimManager.create_pedsim_msg(agent) for agent in agents]
+
+        self._spawn_peds_srv(peds)
 
     def reset_pedsim_agents(self):
-        # self._reset_peds_srv()
+        self._reset_peds_srv()
         pass
 
     def spawn_obstacle(self, position, yaml_path=""):
         pass
 
     def spawn_random_dynamic_obstacle(self, **args):
-        # s_pos = args["position"]
-        # w_pos = self.map_manager.get_random_pos_on_map(
-        #     safe_dist=1, forbidden_zones=[s_pos]
-        # )
-        # ped = self._create_simple_ped([1], [s_pos], [w_pos])
+        s_pos = args["position"]
+        w_pos = self.map_manager.get_random_pos_on_map(
+            safe_dist=1, forbidden_zones=[s_pos]
+        )
+        ped = self._create_simple_ped([1], [s_pos], [w_pos])
         # agents = [PedsimAgent.fromDict(a) for a in ped]
-        # self.spawn_pedsim_agents(agents)
+        self.spawn_pedsim_agents(ped)
 
         pass
 
@@ -124,13 +126,15 @@ class GazeboEnvironment(BaseEnvironment):
         request = SpawnModelRequest()
 
         robot_namespace = self._ns_prefix(namespace_appendix)
-        
+
         robot_description = GazeboEnvironment.get_robot_description(
             robot_name, robot_namespace
         )
-        rospy.set_param(os.path.join(robot_namespace, "robot_description"), robot_description)
+        rospy.set_param(
+            os.path.join(robot_namespace, "robot_description"), robot_description
+        )
         rospy.set_param(os.path.join(robot_namespace, "tf_prefix"), robot_namespace)
-        
+
         request.model_name = name
         request.model_xml = robot_description
         request.robot_namespace = robot_namespace
@@ -183,11 +187,19 @@ class GazeboEnvironment(BaseEnvironment):
     @staticmethod
     def get_robot_description(robot_name, namespace):
         arena_sim_path = rospkg.RosPack().get_path("arena-simulation-setup")
-        
-        return subprocess.check_output([
-            "rosrun", 
-            "xacro",
-            "xacro",
-            os.path.join(arena_sim_path, "robot", robot_name, "urdf", f"{robot_name}.urdf.xacro"),
-            f"robot_namespace:={namespace}"
-        ]).decode("utf-8")
+
+        return subprocess.check_output(
+            [
+                "rosrun",
+                "xacro",
+                "xacro",
+                os.path.join(
+                    arena_sim_path,
+                    "robot",
+                    robot_name,
+                    "urdf",
+                    f"{robot_name}.urdf.xacro",
+                ),
+                f"robot_namespace:={namespace}",
+            ]
+        ).decode("utf-8")
