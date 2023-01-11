@@ -1,0 +1,126 @@
+{
+    "pedsim_agents": [
+        {
+            "name": "2",
+            "id": 0,
+            "pos": [
+                5.0,
+                5.0
+            ],
+            "type": "adult",
+            "yaml_file": "",
+            "number_of_peds": 1,
+            "vmax": 0.30000000000000004,
+            "start_up_mode": "default",
+            "wait_time": 0.0,
+            "trigger_zone_radius": 0.0,
+            "chatting_probability": 0.0,
+            "tell_story_probability": 0.0,
+            "group_talking_probability": 0.0,
+            "talking_and_walking_probability": 0.0,
+            "requesting_service_probability": 0.0,
+            "requesting_guide_probability": 0.0,
+            "requesting_follower_probability": 0.0,
+            "max_talking_distance": 5,
+            "max_servicing_radius": 5,
+            "talking_base_time": 10,
+            "tell_story_base_time": 0.0,
+            "group_talking_base_time": 10,
+            "talking_and_walking_base_time": 6,
+            "receiving_service_base_time": 20,
+            "requesting_service_base_time": 30,
+            "force_factor_desired": 1,
+            "force_factor_obstacle": 1,
+            "force_factor_social": 5,
+            "force_factor_robot": 0,
+            "waypoints": [
+                [
+                    5.6,
+                    9.67
+                ],
+                [
+                    13.7,
+                    10.43
+                ],
+                [
+                    22.31,
+                    10.91
+                ],
+                [
+                    18.7,
+                    17.24
+                ],
+                [
+                    5.88,
+                    17.11
+                ]
+            ],
+            "waypoint_mode": 0
+        },
+        {
+            "name": "3",
+            "id": 0,
+            "pos": [
+                4.0,
+                10.0
+            ],
+            "type": "adult",
+            "yaml_file": "dynamic_obstacles/person_two_legged.model.yaml",
+            "number_of_peds": 1,
+            "vmax": 0.3,
+            "start_up_mode": "default",
+            "wait_time": 0.0,
+            "trigger_zone_radius": 0.0,
+            "chatting_probability": 0.0,
+            "tell_story_probability": 0.0,
+            "group_talking_probability": 0.0,
+            "talking_and_walking_probability": 0.0,
+            "requesting_service_probability": 0.0,
+            "requesting_guide_probability": 0.0,
+            "requesting_follower_probability": 0.0,
+            "max_talking_distance": 5.0,
+            "max_servicing_radius": 5.0,
+            "talking_base_time": 10.0,
+            "tell_story_base_time": 0.0,
+            "group_talking_base_time": 10.0,
+            "talking_and_walking_base_time": 6.0,
+            "receiving_service_base_time": 20.0,
+            "requesting_service_base_time": 30.0,
+            "force_factor_desired": 1.0,
+            "force_factor_obstacle": 1.0,
+            "force_factor_social": 5.0,
+            "force_factor_robot": 0.0,
+            "waypoints": [
+                [
+                    27.63,
+                    10.36
+                ],
+                [
+                    3.45,
+                    18.22
+                ],
+                [
+                    27.24,
+                    19.26
+                ],
+                [
+                    16.31,
+                    14.52
+                ]
+            ],
+            "waypoint_mode": 0
+        }
+    ],
+    "static_obstacles": [],
+    "robot_position": [
+        9.52,
+        20.69
+    ],
+    "robot_goal": [
+        24.61,
+        3.77
+    ],
+    "resets": 10,
+    "map_path": "/home/jacek/catkin_ws/src/utils/arena-simulation-setup/maps/map_empty/map.yaml",
+    "format": "arena-tools"
+}
